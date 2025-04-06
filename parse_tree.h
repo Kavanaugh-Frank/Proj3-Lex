@@ -44,14 +44,14 @@ class StringExpression {
     public:
         virtual ~StringExpression() = default;
         // Pure virtual function to evaluate the expression
-        virtual string evaluateExpression(std::map<std::string, int>& symTab) = 0;
+        virtual string evaluateExpression(std::map<std::string, string>& symTab) = 0;
 };
 
 class StringConstant : public StringExpression {
     public:
         explicit StringConstant(string val) : savedVal(val) {}
         // Returns the constant value
-        string evaluateExpression(std::map<std::string, int>& symTab) override {
+        string evaluateExpression(std::map<std::string, string>& symTab) override {
             return savedVal;
     }
 
@@ -64,14 +64,17 @@ class StringVariable : public StringExpression {
         explicit StringVariable(const std::string& inVal) : savedVal(inVal) {}
         ~StringVariable() override = default;
         // Looks up the variable in the symbol table and returns its value
-        string evaluateExpression(std::map<std::string, int>& symTab) override {
+        string evaluateExpression(std::map<std::string, string>& symTab) override {
             auto it = symTab.find(savedVal);
             if (it != symTab.end()) {
-                return std::to_string(it->second);
+                return it->second;
             } else {
                 // Error handling: variable not found
                 throw std::runtime_error("Variable not found: " + savedVal);
             }
+        }
+        string ID(){
+            return savedVal;
         }
     private:
         std::string savedVal; // The variable name
@@ -125,15 +128,17 @@ class Statement {
 // Represents an assignment between a StringVariable and a StringConstant
 class StringAssignment : public Statement {
     public:
-        StringAssignment(StringVariable* variable, StringConstant* constant)
-            : variable(variable), constant(constant) {}
+        StringAssignment(const string& variable_name, StringConstant* constant)
+            : variable_name(variable_name), constant(constant) {}
+
+        ~StringAssignment() override = default;
 
         void evaluateStatement(std::map<std::string, int>& symTab, std::map<std::string, std::string>& strTab) override {
-            strTab[variable->evaluateExpression(symTab)] = constant->evaluateExpression(symTab);
+            strTab[variable_name] = constant->evaluateExpression(strTab);
         }
 
     private:
-        StringVariable* variable; // The variable to assign to
+        string variable_name; // The variable to assign to
         StringConstant* constant; // The constant value to assign
 };
 

@@ -1,28 +1,34 @@
 #include "./parse_tree.h"
 #include "./tree_node.h"
 #include <iostream>
+#include <map>
 
 
-int main(){
+int main() {
+    // Symbol tables for integer and string variables
     std::map<std::string, int> symTab;
-    std::map<std::string, std::string> symTabStr;
+    std::map<std::string, std::string> strTab;
 
-    StringVariable* name = new StringVariable("name");
-    StringConstant* nameVal = new StringConstant("root");
+    // Create a StringVariable named "name"
+    StringVariable* nameVar = new StringVariable("name");
 
-    StringAssignment* nameAssign = new StringAssignment(name, nameVal);
+    // Create a StringConstant with the value "root"
+    StringConstant* rootConst = new StringConstant("root");
 
-    nameAssign->evaluateStatement(symTab, symTabStr);
+    // strTab["name"] = "root";
+    // Create a StringAssignment to assign "root" to "name"
+    StringAssignment* assign = new StringAssignment(nameVar->ID(), rootConst);
 
-    // Print the values in symTabStr
-    for (const auto& pair : symTabStr) {
-        std::cout << pair.first << " = " << pair.second << std::endl;
-    }
+    // Evaluate the assignment
+    assign->evaluateStatement(symTab, strTab);
+
+    // Output the value of "name" from the string symbol table
+    std::cout << "The value of 'name' is: " << strTab["name"] << std::endl;
 
     // Clean up dynamically allocated memory
-    delete name;
-    delete nameVal;
-    delete nameAssign;
+    delete nameVar;
+    delete rootConst;
+    delete assign;
 
     return 0;
 }
