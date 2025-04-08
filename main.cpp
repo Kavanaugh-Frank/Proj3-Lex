@@ -1,34 +1,33 @@
 #include "./parse_tree.h"
 #include "./tree_node.h"
-#include <iostream>
 #include <map>
 
 
 int main() {
-    // Symbol tables for integer and string variables
     std::map<std::string, int> symTab;
     std::map<std::string, std::string> strTab;
+    std::map<std::string, TreeNode*> nodeTab;
 
-    // Create a StringVariable named "name"
-    StringVariable* nameVar = new StringVariable("name");
+    // Example: Assign a string literal to a variable
+    StringAssignment* stringAssign = new StringAssignment("var1", new StringConstant("A"));
+    stringAssign->evaluateStatement(symTab, strTab);
+    std::cout << "var1: " << strTab[stringAssign->ID()] << std::endl;
 
-    // Create a StringConstant with the value "root"
-    StringConstant* rootConst = new StringConstant("root");
+    // Example: Concatenate a string literal with an integer
+    StringAssignment* concatenatedAssign = new StringAssignment("var2", new StringIntConcatenation(new StringConstant("A"), new IntConstant(1), true));
+    concatenatedAssign->evaluateStatement(symTab, strTab);
+    std::cout << "var2: " << strTab[concatenatedAssign->ID()] << std::endl;
 
-    // strTab["name"] = "root";
-    // Create a StringAssignment to assign "root" to "name"
-    StringAssignment* assign = new StringAssignment(nameVar->ID(), rootConst);
+    // Example: Assign an integer to a variable
+    IntAssignment* intAssign = new IntAssignment("weight", new IntConstant(10));
+    intAssign->evaluateStatement(symTab, strTab);
+    std::cout << "weight: " << symTab[intAssign->ID()] << std::endl;
 
-    // Evaluate the assignment
-    assign->evaluateStatement(symTab, strTab);
+    // Example: Build a node using values from the symbol and string table
+    buildNode* node = new buildNode(strTab[stringAssign->ID()], symTab[intAssign->ID()], strTab[concatenatedAssign->ID()]);
+    node->evaluateStatement(symTab, strTab, nodeTab);
 
-    // Output the value of "name" from the string symbol table
-    std::cout << "The value of 'name' is: " << strTab["name"] << std::endl;
-
-    // Clean up dynamically allocated memory
-    delete nameVar;
-    delete rootConst;
-    delete assign;
+    nodeTab[node->ID()]->print();
 
     return 0;
 }

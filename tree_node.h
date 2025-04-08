@@ -4,15 +4,18 @@
 
 using namespace std;
 
-class TreeNode{
+#ifndef TREE_NODE_H
+#define TREE_NODE_H
+
+class TreeNode {
     public:
-        TreeNode(string name, int weight){
+        TreeNode(string name, int weight, TreeNode* parent = nullptr) {
             this->name = name;
             this->weight = weight;
             this->parent = parent;
         }
 
-        void addChild(TreeNode* child){
+        void addChild(TreeNode* child) {
             childList.push_back(child);
         }
 
@@ -24,7 +27,7 @@ class TreeNode{
                     cout << ", ";
                 }
             }
-            cout << "]";
+            cout << "]" << endl;
         }
 
     private:
@@ -33,3 +36,5 @@ class TreeNode{
         TreeNode* parent;
         vector<TreeNode*> childList;
 };
+
+#endif

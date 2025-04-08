@@ -1,101 +1,32 @@
-//****************************************************************
-// File: parse_tree.h
-// Author: David W. Juedes
-//
-// Copyright 2007, All rights reserved.
-// Purpose: This .h file includes a hierarchy
-// of classes that define possible
-// instructions in the pfig language
-//
-// In general, there are statements,
-// boolean expressions, and integer_expressions
-//
-//******************************************************************
-
 #ifndef PARSE_TREE_H
 #define PARSE_TREE_H
 
 #include <map>
 #include <string>
 #include <iostream>
+#include <stdexcept>
+#include "./tree_node.h"
 
 using namespace std;
 
+// Base class for integer expressions
 class IntegerExpression {
     public:
         virtual ~IntegerExpression() = default;
         // Pure virtual function to evaluate the expression
-        virtual int evaluateExpression(std::map<std::string, int>& symTab) = 0;
+        virtual int evaluateExpression(std::map<std::string, int>& symTab, std::map<std::string, std::string>& strTab) = 0;
 };
 
+// Represents a constant integer value
 class IntConstant : public IntegerExpression {
     public:
         explicit IntConstant(int val) : savedVal(val) {}
-        // Returns the constant value
-        int evaluateExpression(std::map<std::string, int>& symTab) override {
+        int evaluateExpression(std::map<std::string, int>& symTab, std::map<std::string, std::string>& strTab) override {
             return savedVal;
         }
 
     private:
         int savedVal; // The constant value
-};
-
-class StringExpression {
-    public:
-        virtual ~StringExpression() = default;
-        // Pure virtual function to evaluate the expression
-        virtual string evaluateExpression(std::map<std::string, string>& symTab) = 0;
-};
-
-class StringConstant : public StringExpression {
-    public:
-        explicit StringConstant(string val) : savedVal(val) {}
-        // Returns the constant value
-        string evaluateExpression(std::map<std::string, string>& symTab) override {
-            return savedVal;
-    }
-
-    private:
-        string savedVal; // The constant value
-};
-
-class StringVariable : public StringExpression {
-    public:
-        explicit StringVariable(const std::string& inVal) : savedVal(inVal) {}
-        ~StringVariable() override = default;
-        // Looks up the variable in the symbol table and returns its value
-        string evaluateExpression(std::map<std::string, string>& symTab) override {
-            auto it = symTab.find(savedVal);
-            if (it != symTab.end()) {
-                return it->second;
-            } else {
-                // Error handling: variable not found
-                throw std::runtime_error("Variable not found: " + savedVal);
-            }
-        }
-        string ID(){
-            return savedVal;
-        }
-    private:
-        std::string savedVal; // The variable name
-};
-
-// Represents a variable
-class Variable : public IntegerExpression {
-    public:
-        explicit Variable(const std::string& inVal) : savedVal(inVal) {}
-        // Looks up the variable in the symbol table and returns its value
-        int evaluateExpression(std::map<std::string, int>& symTab) override {
-            auto it = symTab.find(savedVal);
-            if (it != symTab.end()) {
-                return it->second;
-            } else {
-                // Error handling: variable not found
-                throw std::runtime_error("Variable not found: " + savedVal);
-            }
-        }
-    private:
-        std::string savedVal; // The variable name
 };
 
 // Base class for binary integer expressions
@@ -113,10 +44,54 @@ class BinaryExpression : public IntegerExpression {
 class PlusExpr : public BinaryExpression {
     public:
         using BinaryExpression::BinaryExpression;
-        int evaluateExpression(std::map<std::string, int>& symTab) override {
-            return left->evaluateExpression(symTab) + right->evaluateExpression(symTab);
+        int evaluateExpression(std::map<std::string, int>& symTab, std::map<std::string, std::string>& strTab) override {
+            return left->evaluateExpression(symTab, strTab) + right->evaluateExpression(symTab, strTab);
         }
 };
+
+// Base class for string expressions
+class StringExpression {
+    public:
+        virtual ~StringExpression() = default;
+        // Pure virtual function to evaluate the expression
+        virtual string evaluateExpression(std::map<std::string, int>& symTab, std::map<std::string, std::string>& strTab) = 0;
+};
+
+// Represents a constant string value
+class StringConstant : public StringExpression {
+    public:
+        explicit StringConstant(string val) : savedVal(val) {}
+        string evaluateExpression(std::map<std::string, int>& symTab, std::map<std::string, std::string>& strTab) override {
+            return savedVal;
+        }
+
+    private:
+        string savedVal; // The constant value
+};
+
+class StringIntConcatenation: public StringExpression{
+    public:
+        StringIntConcatenation(StringExpression* strExpr, IntegerExpression* intExpr, bool isStrFirst)
+            : strExpr(strExpr), intExpr(intExpr), isStrFirst(isStrFirst) {}
+
+        ~StringIntConcatenation() = default;
+
+        string evaluateExpression(std::map<std::string, int>& symTab, std::map<std::string, std::string>& strTab) override {
+            string strValue = strExpr->evaluateExpression(symTab, strTab);
+            int intValue = intExpr->evaluateExpression(symTab, strTab);
+            if (isStrFirst) {
+                return strValue + std::to_string(intValue);
+            } else {
+                return std::to_string(intValue) + strValue;
+            }
+        }
+
+    private:
+        StringExpression* strExpr;  // The string expression
+        IntegerExpression* intExpr; // The integer expression
+        bool isStrFirst;            // Determines the order of concatenation
+};
+
 // Base class for statements
 class Statement {
     public:
@@ -124,22 +99,86 @@ class Statement {
         // Pure virtual function to evaluate the statement
         virtual void evaluateStatement(std::map<std::string, int>& symTab, std::map<std::string, std::string>& strTab) = 0;
 };
+// Represents a compound statement consisting of multiple statements
+class CompoundStatement : public Statement {
+    public:
+        CompoundStatement(Statement* first, CompoundStatement* rest)
+            : firstStatement(first), restStatements(rest) {}
+
+        void evaluateStatement(std::map<std::string, int>& symTab, std::map<std::string, std::string>& strTab) override {
+            if (firstStatement != nullptr) {
+                firstStatement->evaluateStatement(symTab, strTab);
+            }
+            if (restStatements != nullptr) {
+                restStatements->evaluateStatement(symTab, strTab);
+            }
+        }
+
+    private:
+        Statement* firstStatement;         // The first statement in the compound
+        CompoundStatement* restStatements; // The rest of the compound statements
+};
 
 // Represents an assignment between a StringVariable and a StringConstant
 class StringAssignment : public Statement {
     public:
-        StringAssignment(const string& variable_name, StringConstant* constant)
+        StringAssignment(const string& variable_name, StringExpression* constant)
             : variable_name(variable_name), constant(constant) {}
 
         ~StringAssignment() override = default;
 
         void evaluateStatement(std::map<std::string, int>& symTab, std::map<std::string, std::string>& strTab) override {
-            strTab[variable_name] = constant->evaluateExpression(strTab);
+            strTab[variable_name] = constant->evaluateExpression(symTab, strTab);
+        } 
+
+        string ID(){
+            return variable_name;
         }
 
     private:
         string variable_name; // The variable to assign to
-        StringConstant* constant; // The constant value to assign
+        StringExpression* constant; // The constant value to assign
 };
 
-#endif // PARSE_TREE_H
+// Represents an assignment between a Variable and an IntConstant
+class IntAssignment : public Statement {
+    public:
+        IntAssignment(const string& variable_name, IntConstant* constant)
+            : variable_name(variable_name), constant(constant) {}
+
+        ~IntAssignment() override = default;
+
+        void evaluateStatement(std::map<std::string, int>& symTab, std::map<std::string, std::string>& strTab) override {
+            symTab[variable_name] = constant->evaluateExpression(symTab, strTab);
+        }
+
+        string ID(){
+            return variable_name;
+        }
+
+    private:
+        string variable_name; // The variable to assign to
+        IntConstant* constant; // The constant value to assign
+};
+
+class buildNode {
+    public:
+        buildNode(const string& name, int weight, const string& parent)
+            : name(name), weight(weight), parent(parent) {}
+
+        void evaluateStatement(std::map<std::string, int>& symTab, std::map<std::string, std::string>& strTab, std::map<std::string, TreeNode*>& nodeTab) {
+            cout << "Name: " << name << ", Weight: " << weight << ", Parent: " << parent << endl;
+            nodeTab[name] = new TreeNode(name, weight, nullptr);
+        }
+        
+        string ID(){
+            return name;
+        }
+
+    private:
+        string name;
+        int weight;
+        string parent;
+};
+
+#endif
