@@ -208,7 +208,16 @@ class buildNode {
         // Evaluates the node creation by printing its details and adding it to the node table
         void evaluateStatement(std::map<std::string, int>& symTab, std::map<std::string, std::string>& strTab, std::map<std::string, TreeNode*>& nodeTab) {
             cout << "Name: " << name << ", Weight: " << weight << ", Parent: " << parent << endl;
+            if(parent == ""){
             nodeTab[name] = new TreeNode(name, weight, nullptr);
+            }else{
+            if (!parent.empty() && nodeTab.find(parent) != nodeTab.end()) {
+                nodeTab[name] = new TreeNode(name, weight, nodeTab[parent]);
+                nodeTab[parent]->addChild(new TreeNode(name, weight, nodeTab[parent]));
+            }else{
+                throw std::runtime_error("Parent node '" + parent + "' not found in the node table.");
+            }   
+            }
         }
         
         // Returns the node's name

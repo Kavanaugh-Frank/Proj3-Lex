@@ -27,7 +27,7 @@ class TreeNode {
                     cout << ", ";
                 }
             }
-            cout << "]" << endl;
+            cout << "]";
         }
 
     private:
