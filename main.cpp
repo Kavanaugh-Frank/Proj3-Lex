@@ -16,7 +16,7 @@ int main() {
     root_intAssign->evaluateStatement(symTab, strTab);
     std::cout << "weight: " << symTab[root_intAssign->ID()] << std::endl;
 
-    buildNode* root_node = new buildNode(strTab[root_stringAssign->ID()], symTab[root_intAssign->ID()], "");
+    BuildNode* root_node = new BuildNode(strTab[root_stringAssign->ID()], symTab[root_intAssign->ID()], "");
     root_node->evaluateStatement(symTab, strTab, nodeTab);
 
     
@@ -38,15 +38,14 @@ int main() {
     intAssign->evaluateStatement(symTab, strTab);
     std::cout << "weight: " << symTab[intAssign->ID()] << std::endl;
 
-    buildNode* node = new buildNode(strTab[stringAssign->ID()], symTab[intAssign->ID()], strTab[concatenatedAssign->ID()]);
+    BuildNode* node = new BuildNode(strTab[stringAssign->ID()], symTab[intAssign->ID()], strTab[concatenatedAssign->ID()]);
     node->evaluateStatement(symTab, strTab, nodeTab);
 
 
 
-    // printing the table by starting the print process on the root node
-    // this will need to be made into a statement later
-    nodeTab[root_node->ID()]->print();
-    cout << std::endl;
+    Print* print = new Print();
+    print->evaluate(nodeTab, root_node);
+
 
 
 

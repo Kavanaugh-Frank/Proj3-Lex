@@ -199,10 +199,10 @@ class IntAssignment : public Statement {
 
 // Represents the creation of a tree node
 // This class is used to build a tree node with a name, weight, and parent
-class buildNode {
+class BuildNode {
     public:
         // Constructor to initialize the node's name, weight, and parent
-        buildNode(const string& name, int weight, const string& parent)
+        BuildNode(const string& name, int weight, const string& parent)
             : name(name), weight(weight), parent(parent) {}
 
         // Evaluates the node creation by printing its details and adding it to the node table
@@ -229,6 +229,17 @@ class buildNode {
         string name;   // The name of the node
         int weight;    // The weight of the node
         string parent; // The parent of the node
+};
+
+
+class Print {
+    public:
+        Print(){};
+
+        void evaluate(std::map<std::string, TreeNode*>& nodeTab, BuildNode* rootnode){
+            nodeTab[rootnode->ID()]->print();
+            cout << std::endl;
+        }
 };
 
 #endif
