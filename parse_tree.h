@@ -146,4 +146,31 @@ class for_loop {
         }
 };
 
+
+class for_each_loop {
+    private:
+        str_literal* var_name;
+        std::vector<str_literal*> string_literals;
+        std::vector<build_node*> body;
+    public:
+
+        for_each_loop(str_literal* var, std::vector<str_literal*> string_literals, std::vector<build_node*> body)
+            : var_name(var), string_literals(string_literals), body(body) {}
+
+        void execute(std::map<std::string, TreeNode*>& nodeTab) {
+            std::map<std::string, int> int_sym_tab;
+            std::map<std::string, std::string> str_sym_tab;
+
+            std::string loop_var = var_name->evaluate_expression(str_sym_tab);
+
+            for(int i = 0; i < string_literals.size(); i++){
+                str_sym_tab[loop_var] = string_literals[i]->evaluate_expression(str_sym_tab);
+
+                for (int j = 0; j < body.size(); j++) {
+                    body[j]->execute(nodeTab, int_sym_tab, str_sym_tab);
+                }
+            }
+        }
+};
+
 #endif
