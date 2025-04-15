@@ -17,21 +17,21 @@ int main() {
     );
     root.execute(nodeTab, {}, {}); // Execute to add root
 
-    // // 2. Create children in loop (0-2)
-    // std::vector<build_node*> loop_commands;
-    // loop_commands.push_back(new build_node(
-    //     new string_plus_expr(new str_literal("Child"), new var_str_expr("i")), // Name: Child0, Child1, etc.
-    //     new int_literal(1), // Weight
-    //     new str_literal("Root") // Parent
-    // ));
+    // 2. Create children in loop (0-2)
+    std::vector<build_node*> loop_commands;
+    loop_commands.push_back(new build_node(
+        new string_plus_expr(new str_literal("Child"), new var_str_expr("i")), // Name: Child0, Child1, etc.
+        new int_literal(1), // Weight
+        new str_literal("Root") // Parent
+    ));
 
-    // for_loop loop(
-    //     new str_literal("i"), // Loop variable
-    //     new int_literal(0),   // Start
-    //     new int_literal(2),   // End
-    //     loop_commands
-    // );
-    // loop.execute(nodeTab); // Creates Child0, Child1, Child2
+    for_loop loop(
+        new str_literal("i"), // Loop variable
+        new int_literal(0),   // Start
+        new int_literal(2),   // End
+        loop_commands
+    );
+    loop.execute(nodeTab); // Creates Child0, Child1, Child2
 
     // Create nodes in foreach loop
     std::vector<build_node*> commands = {
