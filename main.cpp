@@ -10,12 +10,23 @@ int main() {
     std::map<std::string, TreeNode*> nodeTab;
 
     // 1. Create root node
-    build_node root(
+    build_node* root = new build_node(
         new str_literal("Root"),
         new int_literal(0),
         new str_literal("") // No parent
     );
-    root.execute(nodeTab, {}, {}); // Execute to add root
+    root->execute(nodeTab, {}, {}); // Execute to add root
+
+    // 1. Create root node
+    build_node* root2 = new build_node(
+        new str_literal("Root2"),
+        new int_literal(20),
+        new str_literal("Root") // No parent
+    );
+    // pass in {} for standalone buildnodes since the only values that can be passed
+    // in will be literals that do not require the symbol tables
+    // the symbol tables are only there for when building a node inside a for loop
+    root2->execute(nodeTab, {}, {}); // Execute to add root
 
     // 2. Create children in loop (0-2)
     std::vector<build_node*> loop_commands;
@@ -25,13 +36,14 @@ int main() {
         new str_literal("Root") // Parent
     ));
 
-    for_loop loop(
+    for_loop* loop = new for_loop(
         new str_literal("i"), // Loop variable
         new int_literal(0),   // Start
         new int_literal(2),   // End
         loop_commands
     );
-    loop.execute(nodeTab); // Creates Child0, Child1, Child2
+
+    loop->execute(nodeTab); // Creates Child0, Child1, Child2
 
     // Create nodes in foreach loop
     std::vector<build_node*> commands = {
@@ -48,15 +60,14 @@ int main() {
         new str_literal("s3")
     };
     
-    for_each_loop loop1(
+    for_each_loop* loop1 = new for_each_loop(
         new str_literal("x"),  // Loop variable
         values,                // ["s1", "s2", "s3"]
         commands               // Body commands
     );
         
-    loop1.execute(nodeTab);
+    loop1->execute(nodeTab);
 
-    // nodeTab["Root"]->print();
     print* print_obj = new print( new str_literal("Root") );
 
     print_obj->execute(nodeTab);
