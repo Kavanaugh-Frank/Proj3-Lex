@@ -173,4 +173,17 @@ class for_each_loop {
         }
 };
 
+class print {
+    private:
+        str_literal* node_name;
+    public:
+        print(str_literal* node): node_name(node) {};
+
+        void execute(std::map<std::string, TreeNode*>& nodeTab){
+            nodeTab[node_name->evaluate_expression({})]->print();
+            std::cout << std::endl;
+        }
+};
+
+
 #endif

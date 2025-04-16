@@ -38,7 +38,7 @@ int main() {
         new build_node(
             new string_plus_expr( new str_literal("Node_"), new var_str_expr("x")),
             new int_literal(5),
-            new str_literal("Root")
+            new str_literal("Child0")
         )
     };
     
@@ -56,7 +56,10 @@ int main() {
         
     loop1.execute(nodeTab);
 
-    nodeTab["Root"]->print();
+    // nodeTab["Root"]->print();
+    print* print_obj = new print( new str_literal("Root") );
+
+    print_obj->execute(nodeTab);
 
     // Cleanup
     for (auto& entry : nodeTab) delete entry.second;
