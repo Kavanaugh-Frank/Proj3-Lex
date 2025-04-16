@@ -21,7 +21,7 @@ int main() {
     build_node* root2 = new build_node(
         new str_literal("Root2"),
         new int_literal(20),
-        new str_literal("Root") // No parent
+        new str_literal("Root")
     );
     // pass in {} for standalone buildnodes since the only values that can be passed
     // in will be literals that do not require the symbol tables
