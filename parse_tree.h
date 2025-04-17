@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 #include "./tree_node.h"
 
 class integer_expression {
