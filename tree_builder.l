@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <vector>
+#include "parse_tree.h"
 #include "tree_builder.tab.h" 
 
 extern FILE *yyout;
@@ -49,22 +50,22 @@ NUMERIC [0-9]+
 
 %%
 
-int main(int argc, char **argv) {
-    if (argc < 2) {
-        fprintf(stderr, "Usage: %s <source_file>\n", argv[0]);
-        return EXIT_FAILURE;
-    }
+// int main(int argc, char **argv) {
+//     if (argc < 2) {
+//         fprintf(stderr, "Usage: %s <source_file>\n", argv[0]);
+//         return EXIT_FAILURE;
+//     }
 
-    FILE *file = fopen(argv[1], "r");
-    if (!file) {
-        perror("Error opening file");
-        return EXIT_FAILURE;
-    }
+//     FILE *file = fopen(argv[1], "r");
+//     if (!file) {
+//         perror("Error opening file");
+//         return EXIT_FAILURE;
+//     }
 
-    yyin = file;
-    yyout = stdout;  // Set yyout to stdout to output to the terminal
-    yylex();
-    fclose(file);
+//     yyin = file;
+//     yyout = stdout;  // Set yyout to stdout to output to the terminal
+//     yylex();
+//     fclose(file);
 
-    return 0;
-}
+//     return 0;
+// }

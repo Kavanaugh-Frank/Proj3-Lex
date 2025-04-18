@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "./parse_tree.h"
+#include "parse_tree.h"
 
 
 
