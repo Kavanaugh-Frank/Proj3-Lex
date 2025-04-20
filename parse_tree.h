@@ -55,7 +55,13 @@ class var_str_expr : public string_expression {
         
         std::string evaluate_expression(const std::map<std::string, std::string>& str_sym_tab) override {
             auto it = str_sym_tab.find(var_name);
-            if (it == str_sym_tab.end()) throw std::runtime_error("Undefined string variable: " + var_name);
+            if (it == str_sym_tab.end()) {
+                std::string error_message = "Undefined string variable: " + var_name + "\nSymbol Table:\n";
+                for (const auto& pair : str_sym_tab) {
+                    error_message += pair.first + " -> " + pair.second + "\n";
+                }
+                throw std::runtime_error(error_message);
+            }
             return it->second;
         }
 };
@@ -136,7 +142,10 @@ class for_loop {
 
             std::string loop_var = var_name->evaluate_expression(str_sym_tab);
 
-            for (int_sym_tab[loop_var] = start_val; int_sym_tab[loop_var] <= end_val; ++int_sym_tab[loop_var]) {
+            int_sym_tab[loop_var] = start_val;
+            str_sym_tab[loop_var] = std::to_string(start_val);
+
+            for (; int_sym_tab[loop_var] <= end_val; ++int_sym_tab[loop_var]) {
                 std::string var_string = std::to_string(int_sym_tab[loop_var]); // to give the string for the name and ischildof
                 str_sym_tab[loop_var] = var_string;
 
