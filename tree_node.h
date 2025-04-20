@@ -20,14 +20,17 @@ class TreeNode {
         }
 
         void print() {
-            cout << name << " [";
-            for (int i = 0; i < childList.size(); i++) {
-                childList[i]->print();
-                if (i < childList.size() - 1) {
-                    cout << ", ";
+            cout << name;
+            if(childList.size() > 0){
+                cout << " [";
+                for (int i = 0; i < childList.size(); i++) {
+                    childList[i]->print();
+                    if (i < childList.size() - 1) {
+                        cout << ", ";
+                    }
                 }
+                cout << "]";
             }
-            cout << "]";
         }
 
     private:
