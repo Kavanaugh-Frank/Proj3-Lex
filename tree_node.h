@@ -1,3 +1,5 @@
+/*Created by Kavanaugh Frank and Alec Martell for Project 2*/
+
 #include <iostream>
 #include <vector>
 #include <string>
